@@ -39,6 +39,7 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
         ];
         const dailyWordList = Object.values(orderedWordList)[currentDay];
         const newWord = dailyWordList[Math.floor(Math.random() * dailyWordList.length - 1)];
+        console.log('');
         return {
             dbDay: databaseDay,
             day: currentDay,
