@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import getDailyWord from '../services/codle.db.js';
 import { seedDatabase } from '../services/codle.db.js';
-const httpGetCodleWord = (_req, res) => {
-    let word = getDailyWord();
+const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let word = yield getDailyWord();
     let errorCounter = 0;
     while (errorCounter < 5 && !word) {
-        word = getDailyWord();
+        word = yield getDailyWord();
         errorCounter++;
     }
     if (errorCounter >= 5 && !word) {
@@ -22,7 +22,7 @@ const httpGetCodleWord = (_req, res) => {
     else {
         return res.status(200).send({ codleWord: word });
     }
-};
+});
 export const httpSeedData = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield seedDatabase();
     res.status(200).send('Finished');

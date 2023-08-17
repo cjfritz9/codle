@@ -2,12 +2,12 @@ import { Request, Response } from 'express';
 import getDailyWord from '../services/codle.db.js';
 import { seedDatabase } from '../services/codle.db.js';
 
-const httpGetCodleWord = (_req: Request, res: Response) => {
-  let word = getDailyWord();
+const httpGetCodleWord = async (_req: Request, res: Response) => {
+  let word = await getDailyWord();
   let errorCounter = 0;
 
   while (errorCounter < 5 && !word) {
-    word = getDailyWord();
+    word = await getDailyWord();
     errorCounter++;
   }
 
