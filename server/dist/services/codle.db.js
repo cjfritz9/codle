@@ -44,3 +44,4 @@ export const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* ()
     const weekdays = collection.doc('wordList');
     yield weekdays.set(wordsData, { merge: true });
 });
+export default getDailyWord;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import getDailyWord from '../models/codle.model.js';
+import getDailyWord from '../services/codle.db.js';
 import { seedDatabase } from '../services/codle.db.js';
 
 const httpGetCodleWord = (_req: Request, res: Response) => {

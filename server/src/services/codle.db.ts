@@ -51,3 +51,5 @@ export const seedDatabase = async () => {
 
   await weekdays.set(wordsData, { merge: true });
 };
+
+export default getDailyWord;

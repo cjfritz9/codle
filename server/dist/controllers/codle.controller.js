@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import getDailyWord from '../models/codle.model.js';
+import getDailyWord from '../services/codle.db.js';
 import { seedDatabase } from '../services/codle.db.js';
 const httpGetCodleWord = (_req, res) => {
     let word = getDailyWord();
