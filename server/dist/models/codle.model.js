@@ -103,10 +103,4 @@ export const getWordsObject = () => {
         sunday: wordList.slice(wordsPerDay * 6)
     };
 };
-const wordsData = getWordsObject();
-for (const word in wordsData) {
-    console.log(word);
-    console.log(wordsData[word]);
-    // weekdays.doc(word).update({words: wordsData[word as keyof typeof wordsData]})
-}
 export default getNewDailyWord;

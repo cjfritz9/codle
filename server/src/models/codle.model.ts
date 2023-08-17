@@ -115,12 +115,4 @@ export const getWordsObject = () => {
   };
 };
 
-const wordsData = getWordsObject();
-
-for (const word in wordsData) {
-  console.log(word);
-  console.log(wordsData[word as keyof typeof wordsData]);
-  // weekdays.doc(word).update({words: wordsData[word as keyof typeof wordsData]})
-}
-
 export default getNewDailyWord;
