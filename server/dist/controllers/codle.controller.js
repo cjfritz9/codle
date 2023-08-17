@@ -24,7 +24,7 @@ const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 export const httpSeedData = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield seedDatabase();
-    res.status(200).send('Finished');
+    const result = yield seedDatabase();
+    res.status(200).send({ ok: 'Finished', result });
 });
 export default httpGetCodleWord;

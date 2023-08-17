@@ -59,6 +59,7 @@ export const getList = () => {
 
 const isListValid = (list: typeof wordList) => {
   const invalidItems = list.filter((word) => word.length !== 5);
+  
   if (hasDuplicates(list)) {
     const duplicates = getDuplicates(list);
     throw new Error('List contains duplicate items', {

@@ -54,9 +54,15 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 export const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     const wordsData = getWordsObject();
+    const listData = getList();
     const weekdays = collection.doc('wordList');
     const fullList = collection.doc('fullWordList');
     yield weekdays.set(wordsData, { merge: true });
-    yield fullList.set({ list: getList() });
+    yield fullList.set({ list: listData });
+    return {
+        ok: 'Finished',
+        weekdays: wordsData,
+        fullList: listData
+    };
 });
 export default getDailyWord;

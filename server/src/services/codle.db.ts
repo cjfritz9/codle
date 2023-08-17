@@ -58,6 +58,7 @@ const getDailyWord = async () => {
 
 export const seedDatabase = async () => {
   const wordsData = getWordsObject();
+  const listData = getList();
 
   const weekdays = collection.doc('wordList');
 
@@ -65,7 +66,13 @@ export const seedDatabase = async () => {
 
   await weekdays.set(wordsData, { merge: true });
 
-  await fullList.set({ list: getList()})
+  await fullList.set({ list: listData });
+
+  return {
+    ok: 'Finished',
+    weekdays: wordsData,
+    fullList: listData
+  }
 };
 
 export default getDailyWord;
