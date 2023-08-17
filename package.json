@@ -1,0 +1,28 @@
+{
+  "name": "codle",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "server/dist/server.js",
+  "scripts": {
+    "start": "node server/dist/server.js",
+    "start-dev": "nodemon server/dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^20.5.0",
+    "nodemon": "^3.0.1",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^11.10.1",
+    "morgan": "^1.10.0"
+  }
+}
