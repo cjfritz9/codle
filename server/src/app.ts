@@ -25,4 +25,9 @@ app.get('/codle/validate', httpValidateData);
 import { httpRemoveDuplicates } from './controllers/codle.controller.js';
 app.get('/codle/cleanup', httpRemoveDuplicates);
 
+app.get('/*', (req, res) => {
+  const reqUrl = req.url;
+  res.status(404).send(`No page found ${reqUrl}`);
+});
+
 export default app;
