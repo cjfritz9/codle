@@ -4,12 +4,13 @@ import firestore from './firestore.js';
 import { Timestamp } from 'firebase-admin/firestore';
 
 const collection = firestore.collection('codle');
+const dailyWordRef = collection.doc('dailyWord');
 
 const getDailyWord = async () => {
   const unixEpochSeconds = Math.round(Date.now() / 1000);
   const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
 
-  const dailyWordDoc = await collection.doc('dailyWord').get();
+  const dailyWordDoc = await dailyWordRef.get();
 
   const wordData = dailyWordDoc.data() as DailyWordDocument;
   if (!wordData) return;
@@ -40,7 +41,11 @@ const getDailyWord = async () => {
 
     const dailyWordList = Object.values(orderedWordList)[currentDay];
     const newWord =
-      dailyWordList[Math.floor(Math.random() * dailyWordList.length - 1)];
+      dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
+
+    const result = await dailyWordRef.set({ dailyWord: newWord });
+
+    return result;
 
     return {
       dbDay: databaseDay,

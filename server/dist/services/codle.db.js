@@ -10,10 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { getWordsObject } from '../models/codle.model.js';
 import firestore from './firestore.js';
 const collection = firestore.collection('codle');
+const dailyWordRef = collection.doc('dailyWord');
 const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-    const dailyWordDoc = yield collection.doc('dailyWord').get();
+    const dailyWordDoc = yield dailyWordRef.get();
     const wordData = dailyWordDoc.data();
     if (!wordData)
         return;
@@ -38,7 +39,9 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
             wordList.sunday
         ];
         const dailyWordList = Object.values(orderedWordList)[currentDay];
-        const newWord = dailyWordList[Math.floor(Math.random() * dailyWordList.length - 1)];
+        const newWord = dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
+        const result = yield dailyWordRef.set({ dailyWord: newWord });
+        return result;
         return {
             dbDay: databaseDay,
             day: currentDay,
