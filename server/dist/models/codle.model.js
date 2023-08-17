@@ -48,7 +48,7 @@ const wordList = [
     'figma',
     'bytes'
 ];
-const getList = () => {
+export const getList = () => {
     if (isListValid(wordList)) {
         return wordList;
     }

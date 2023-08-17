@@ -1,5 +1,5 @@
 import { DailyWordDocument, WordListDocument } from '../@types/firebase.js';
-import { getWordsObject } from '../models/codle.model.js';
+import { getList, getWordsObject } from '../models/codle.model.js';
 import firestore from './firestore.js';
 import { Timestamp } from 'firebase-admin/firestore';
 
@@ -43,17 +43,16 @@ const getDailyWord = async () => {
     const newWord =
       dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
 
-    const result = await dailyWordRef.set({ dailyWord: newWord });
+    const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
+    const result = await dailyWordRef.set({
+      dailyWord: newWord,
+      updatedAt: timestamp
+    });
 
-    return result;
-
-    return {
-      dbDay: databaseDay,
-      day: currentDay,
-      dailyWords: dailyWordList,
-      newWord,
-      wordList: orderedWordList
-    };
+    if (result.writeTime.toDate().getDay() === timestamp.toDate().getDay()) {
+      return newWord;
+    }
+    return;
   }
 };
 
@@ -62,7 +61,11 @@ export const seedDatabase = async () => {
 
   const weekdays = collection.doc('wordList');
 
+  const fullList = collection.doc('fullWordList');
+
   await weekdays.set(wordsData, { merge: true });
+
+  await fullList.set({ list: getList()})
 };
 
 export default getDailyWord;
