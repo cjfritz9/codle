@@ -8,7 +8,7 @@ app.use(cors({
 app.use(morgan('combined'));
 app.use(express.json());
 import httpGetCodleWord from './controllers/codle.controller.js';
-app.get('/codle', httpGetCodleWord);
+app.get('/codle/word', httpGetCodleWord);
 import { httpSeedData } from './controllers/codle.controller.js';
 app.get('/codle/seed', httpSeedData);
 import { httpValidateData } from './controllers/codle.controller.js';
