@@ -28,15 +28,26 @@ const getDailyWord = async () => {
 
     if (!wordList) return;
 
-    const dailyWordList = Object.values(wordList)[currentDay];
-    const newWord = dailyWordList[Math.floor(Math.random() * dailyWordList.length - 1)];
+    const orderedWordList = [
+      wordList.monday,
+      wordList.tuesday,
+      wordList.wednesday,
+      wordList.thursday,
+      wordList.friday,
+      wordList.saturday,
+      wordList.sunday
+    ];
+
+    const dailyWordList = Object.values(orderedWordList)[currentDay];
+    const newWord =
+      dailyWordList[Math.floor(Math.random() * dailyWordList.length - 1)];
 
     return {
       dbDay: databaseDay,
       day: currentDay,
       dailyWords: dailyWordList,
       newWord,
-      wordList
+      wordList: orderedWordList
     };
   }
 };
