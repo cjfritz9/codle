@@ -1,7 +1,7 @@
 {
   "name": "codle",
   "version": "1.0.0",
-  "description": "",
+  "description": "API for a programming based Wordle clone",
   "type": "module",
   "main": "server/dist/server.js",
   "scripts": {

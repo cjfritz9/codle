@@ -15,7 +15,6 @@ const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, functi
     while (errorCounter < 5 && !word) {
         word = yield getDailyWord();
         errorCounter++;
-        console.log({ word, errorCounter });
     }
     if (errorCounter >= 5 && !word) {
         return res.status(500).send({ error: 'Internal Application Error' });
