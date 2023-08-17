@@ -33,9 +33,10 @@ const getDailyWord = async () => {
     return dailyWord;
   } else {
     const wordList = (await wordListRef.get()).data() as WordListDocument;
-    if (!wordList) return;
 
     const newWord = getNewDailyWord(wordList, currentDay);
+    if (!newWord) return;
+    
     const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
     const result = await dailyWordRef.set({
       dailyWord: newWord,

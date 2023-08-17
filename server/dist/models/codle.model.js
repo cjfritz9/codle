@@ -33,9 +33,9 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     else {
         const wordList = (yield wordListRef.get()).data();
-        if (!wordList)
-            return;
         const newWord = getNewDailyWord(wordList, currentDay);
+        if (!newWord)
+            return;
         const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
         const result = yield dailyWordRef.set({
             dailyWord: newWord,
