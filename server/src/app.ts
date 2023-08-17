@@ -17,6 +17,12 @@ import httpGetCodleWord from './controllers/codle.controller.js';
 app.get('/codle', httpGetCodleWord);
 
 import { httpSeedData } from './controllers/codle.controller.js';
-app.get('/codle/seed', httpSeedData)
+app.get('/codle/seed', httpSeedData);
+
+import { httpValidateData } from './controllers/codle.controller.js';
+app.get('/codle/validate', httpValidateData);
+
+import { httpRemoveDuplicates } from './controllers/codle.controller.js';
+app.get('/codle/cleanup', httpRemoveDuplicates);
 
 export default app;

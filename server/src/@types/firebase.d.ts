@@ -1,11 +1,11 @@
 import { DocumentData, Timestamp } from 'firebase-admin/firestore';
 
-export type DailyWordDocument = {
+export interface DailyWordDocument {
   dailyWord: string;
   updatedAt: Timestamp;
-};
+}
 
-export type WordListDocument = {
+export interface WordListDocument {
   monday: string[];
   tuesday: string[];
   wednesday: string[];
@@ -13,4 +13,8 @@ export type WordListDocument = {
   friday: string[];
   saturday: string[];
   sunday: string[];
-};
+}
+
+export interface FullWordListDocument {
+  list: string[];
+}
