@@ -25,7 +25,7 @@ const httpGetCodleWord = async (_req: Request, res: Response) => {
 
 export const httpSeedData = async (_req: Request, res: Response) => {
   const result = await seedDatabase();
-  res.status(200).send({ ok: 'Finished', result });
+  res.status(200).send({ result });
 };
 
 export const httpValidateData = async (_req: Request, res: Response) => {
