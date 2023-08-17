@@ -17,10 +17,14 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const dailyWordDoc = yield dailyWordRef.get();
+    if (!dailyWordDoc.exists)
+        return;
     const wordData = dailyWordDoc.data();
     if (!wordData)
         return;
     const { dailyWord, updatedAt } = wordData;
+    if (!dailyWord || !updatedAt)
+        return;
     const databaseDay = updatedAt.toDate().getDay();
     const currentDay = new Date().getDay();
     const isWordOfDay = databaseDay === currentDay;

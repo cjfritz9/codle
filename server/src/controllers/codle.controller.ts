@@ -14,6 +14,7 @@ const httpGetCodleWord = async (_req: Request, res: Response) => {
   while (errorCounter < 5 && !word) {
     word = await getDailyWord();
     errorCounter++;
+    console.log({ word, errorCounter });
   }
 
   if (errorCounter >= 5 && !word) {
@@ -49,7 +50,7 @@ export const httpRemoveDuplicates = async (_req: Request, res: Response) => {
   return res.status(200).send({
     ok: 'Clean up complete',
     duplicates,
-    difference,
+    difference
   });
 };
 

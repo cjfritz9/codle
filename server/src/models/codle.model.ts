@@ -17,11 +17,14 @@ const getDailyWord = async () => {
   const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
 
   const dailyWordDoc = await dailyWordRef.get();
+  if (!dailyWordDoc.exists) return;
 
   const wordData = dailyWordDoc.data() as DailyWordDocument;
   if (!wordData) return;
 
   const { dailyWord, updatedAt } = wordData;
+  if (!dailyWord || !updatedAt) return;
+
   const databaseDay = updatedAt.toDate().getDay();
   const currentDay = new Date().getDay();
   const isWordOfDay = databaseDay === currentDay;
