@@ -6,7 +6,8 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'https://64dff2291d08a60548a522a6--magnificent-conkies-a9ca0c.netlify.app'
+    origin:
+      'https://64dff2291d08a60548a522a6--magnificent-conkies-a9ca0c.netlify.app'
   })
 );
 app.use(
@@ -21,8 +22,8 @@ app.use(express.json());
 import httpGetCodleWord from './controllers/codle.controller.js';
 app.get('/codle/word', httpGetCodleWord);
 
-import { httpSeedData } from './controllers/codle.controller.js';
-app.get('/codle/seed', httpSeedData);
+import { httpAddWord } from './controllers/codle.controller.js';
+app.post('/codle/add-word', httpAddWord);
 
 import { httpValidateData } from './controllers/codle.controller.js';
 app.get('/codle/validate', httpValidateData);

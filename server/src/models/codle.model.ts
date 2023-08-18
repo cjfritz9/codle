@@ -1,4 +1,4 @@
-import { Timestamp } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 import firestore from '../services/firestore.js';
 import {
@@ -36,7 +36,7 @@ const getDailyWord = async () => {
 
     const newWord = getNewDailyWord(wordList, currentDay);
     if (!newWord) return;
-    
+
     const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
     const result = await dailyWordRef.set({
       dailyWord: newWord,
@@ -50,35 +50,6 @@ const getDailyWord = async () => {
   }
 };
 
-export const seedDatabase = async () => {
-  const wordsData = await getWordsObject();
-
-  if (!wordsData) {
-    return {
-      ok: 'Finished',
-      message: 'Getting words document failed'
-    };
-  }
-
-  const listData = await getList();
-  if (!listData) {
-    return {
-      ok: 'Finished',
-      message: 'Getting full list document failed'
-    };
-  }
-
-  const weekdays = wordListRef;
-  await weekdays.set(wordsData, { merge: true });
-  await fullListRef.set({ list: listData });
-
-  return {
-    ok: 'Finished',
-    weekdays: wordsData,
-    fullList: listData
-  };
-};
-
 export const getList = async () => {
   const wordListSnap = await fullListRef.get();
 
@@ -87,6 +58,27 @@ export const getList = async () => {
   const { list } = wordListSnap.data() as FullWordListDocument;
 
   return list;
+};
+
+export const addWord = async (word: string) => {
+  const list = await getList();
+
+  if (!list) return;
+
+  if (list.includes(word)) {
+    return {
+      error: `List already contains ${word}`,
+      cause: { wordIndex: list.indexOf(word) }
+    };
+  }
+
+  await fullListRef.update({
+    list: FieldValue.arrayUnion(word)
+  });
+
+  return {
+    success: 'Word added to word list'
+  };
 };
 
 export const isListValid = (list: string[]) => {
@@ -108,7 +100,7 @@ export const isListValid = (list: string[]) => {
   }
 
   return {
-    success: 'List validation complete'
+    success: 'Word list is valid'
   };
 };
 

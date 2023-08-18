@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import getDailyWord, {
+  addWord,
   getDuplicates,
   getList,
   isListValid,
   removeDuplicates
 } from '../models/codle.model.js';
-import { seedDatabase } from '../models/codle.model.js';
 
 const httpGetCodleWord = async (_req: Request, res: Response) => {
   let word = await getDailyWord();
@@ -23,9 +23,21 @@ const httpGetCodleWord = async (_req: Request, res: Response) => {
   }
 };
 
-export const httpSeedData = async (_req: Request, res: Response) => {
-  const result = await seedDatabase();
-  res.status(200).send({ result });
+export const httpAddWord = async (req: Request, res: Response) => {
+  const { word } = req.body;
+  if (!word) {
+    return res
+      .status(400)
+      .send({ error: 'Missing request data: Word to add to database' });
+  }
+  const result = await addWord(word);
+  if (!result) {
+    return res.status(500).send({ error: 'Internal Application Error' });
+  }
+  if (result.error) {
+    return res.status(410).send(result);
+  }
+  return res.status(201).send(result);
 };
 
 export const httpValidateData = async (_req: Request, res: Response) => {

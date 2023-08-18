@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { Timestamp } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import firestore from '../services/firestore.js';
 const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
@@ -47,36 +47,29 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
         return;
     }
 });
-export const seedDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
-    const wordsData = yield getWordsObject();
-    if (!wordsData) {
-        return {
-            ok: 'Finished',
-            message: 'Getting words document failed'
-        };
-    }
-    const listData = yield getList();
-    if (!listData) {
-        return {
-            ok: 'Finished',
-            message: 'Getting full list document failed'
-        };
-    }
-    const weekdays = wordListRef;
-    yield weekdays.set(wordsData, { merge: true });
-    yield fullListRef.set({ list: listData });
-    return {
-        ok: 'Finished',
-        weekdays: wordsData,
-        fullList: listData
-    };
-});
 export const getList = () => __awaiter(void 0, void 0, void 0, function* () {
     const wordListSnap = yield fullListRef.get();
     if (!wordListSnap.exists)
         return;
     const { list } = wordListSnap.data();
     return list;
+});
+export const addWord = (word) => __awaiter(void 0, void 0, void 0, function* () {
+    const list = yield getList();
+    if (!list)
+        return;
+    if (list.includes(word)) {
+        return {
+            error: `List already contains ${word}`,
+            cause: { wordIndex: list.indexOf(word) }
+        };
+    }
+    yield fullListRef.update({
+        list: FieldValue.arrayUnion(word)
+    });
+    return {
+        success: 'Word added to word list'
+    };
 });
 export const isListValid = (list) => {
     const invalidItems = list.filter((word) => word.length !== 5);
@@ -94,7 +87,7 @@ export const isListValid = (list) => {
         };
     }
     return {
-        success: 'List validation complete'
+        success: 'Word list is valid'
     };
 };
 const hasDuplicates = (list) => {
