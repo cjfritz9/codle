@@ -6,7 +6,12 @@ const app = express();
 
 app.use(
   cors({
-    origin: '*'
+    origin: 'https://cjfritz.dev'
+  })
+);
+app.use(
+  cors({
+    origin: 'http://localhost:3000'
   })
 );
 app.use(morgan('combined'));
