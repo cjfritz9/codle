@@ -6,7 +6,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'https://cjfritz.dev'
+    origin: 'https://64dff2291d08a60548a522a6--magnificent-conkies-a9ca0c.netlify.app'
   })
 );
 app.use(
