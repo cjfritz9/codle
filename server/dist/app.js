@@ -3,10 +3,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 const app = express();
 app.use(cors({
-    origin: 'https://64dff2291d08a60548a522a6--magnificent-conkies-a9ca0c.netlify.app'
-}));
-app.use(cors({
-    origin: 'http://localhost:3000'
+    origin: '*'
 }));
 app.use(morgan('combined'));
 app.use(express.json());
