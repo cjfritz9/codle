@@ -148,4 +148,16 @@ export const getWordsObject = async () => {
   return wordList;
 };
 
+export const getDate = ({tomorrow = false}) => {
+  const date = new Date();
+  date.setUTCHours(0);
+  date.setUTCMinutes(0);
+  date.setUTCSeconds(0);
+  date.setUTCMilliseconds(0);
+  if (tomorrow) {
+    return new Date(date.setDate(date.getDate() + 1));
+  }
+  return date;
+};
+
 export default getDailyWord;

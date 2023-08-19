@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import getDailyWord, { addWord, getDuplicates, getList, isListValid, removeDuplicates } from '../models/codle.model.js';
-const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
+export const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let word = yield getDailyWord();
     let errorCounter = 0;
     while (errorCounter < 5 && !word) {
@@ -60,4 +60,3 @@ export const httpRemoveDuplicates = (_req, res) => __awaiter(void 0, void 0, voi
         difference
     });
 });
-export default httpGetCodleWord;

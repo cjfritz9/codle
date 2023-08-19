@@ -7,7 +7,7 @@ import getDailyWord, {
   removeDuplicates
 } from '../models/codle.model.js';
 
-const httpGetCodleWord = async (_req: Request, res: Response) => {
+export const httpGetCodleWord = async (_req: Request, res: Response) => {
   let word = await getDailyWord();
   let errorCounter = 0;
 
@@ -64,5 +64,3 @@ export const httpRemoveDuplicates = async (_req: Request, res: Response) => {
     difference
   });
 };
-
-export default httpGetCodleWord;

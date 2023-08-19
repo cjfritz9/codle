@@ -1,22 +1,26 @@
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import cookieSession from 'cookie-session';
+import dotenv from 'dotenv';
+import { getDate } from './models/codle.model.js';
+import codleRouter from './routes/codle.router.js';
+import usersRouter from './routes/users.router.js';
+dotenv.config();
 const app = express();
 app.use(cors({
     origin: '*'
 }));
 app.use(morgan('combined'));
 app.use(express.json());
-import httpGetCodleWord from './controllers/codle.controller.js';
-app.get('/codle/word', httpGetCodleWord);
-import { httpAddWord } from './controllers/codle.controller.js';
-app.post('/codle/add-word', httpAddWord);
-import { httpValidateData } from './controllers/codle.controller.js';
-app.get('/codle/validate', httpValidateData);
-import { httpRemoveDuplicates } from './controllers/codle.controller.js';
-app.get('/codle/cleanup', httpRemoveDuplicates);
+app.use(cookieSession({
+    expires: getDate({ tomorrow: true }),
+    secret: process.env.COOKIE_SIGNATURE
+}));
+app.use('/codle', codleRouter);
+app.use('/users', usersRouter);
 app.get('/*', (req, res) => {
     const reqUrl = req.url;
-    res.status(404).send(`No page found ${reqUrl}`);
+    res.status(404).send(`No page found at ${reqUrl}`);
 });
 export default app;

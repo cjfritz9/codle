@@ -1,4 +1,4 @@
-import { DocumentData, Timestamp } from 'firebase-admin/firestore';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export interface DailyWordDocument {
   dailyWord: string;
@@ -17,4 +17,25 @@ export interface WordListDocument {
 
 export interface FullWordListDocument {
   list: string[];
+}
+
+export interface UserDataDocument {
+  updatedAt: Timestamp;
+  guesses: string[];
+  guessMap: string;
+  didWin: boolean;
+}
+
+export interface UserDataParams {
+  guesses: any[];
+  guessMap: string;
+  didWin: boolean;
+}
+
+export interface UserData {
+  id: string;
+  updatedAt: Date;
+  guesses: string[];
+  guessMap: string;
+  didWin: boolean;
 }

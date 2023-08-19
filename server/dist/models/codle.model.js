@@ -125,4 +125,15 @@ export const getWordsObject = () => __awaiter(void 0, void 0, void 0, function* 
     const wordList = wordListDoc.data();
     return wordList;
 });
+export const getDate = ({ tomorrow = false }) => {
+    const date = new Date();
+    date.setUTCHours(0);
+    date.setUTCMinutes(0);
+    date.setUTCSeconds(0);
+    date.setUTCMilliseconds(0);
+    if (tomorrow) {
+        return new Date(date.setDate(date.getDate() + 1));
+    }
+    return date;
+};
 export default getDailyWord;
