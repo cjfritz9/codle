@@ -53,6 +53,9 @@ export const updateUserData = async (
   const unixEpochSeconds = Math.round(Date.now() / 1000);
   const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
   const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
+
+  console.log('update user data:', data);
+  
   await collection.doc(id).update({
     updatedAt,
     ...data
