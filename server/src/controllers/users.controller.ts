@@ -1,11 +1,15 @@
 import { Request, Response } from 'express';
-import { addNewUser, getUserData, updateUserData } from '../models/users.model.js';
+import {
+  addNewUser,
+  getUserData,
+  updateUserData
+} from '../models/users.model.js';
 
 export const httpGetUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   if (!id) {
-    return res.redirect('/add');
+    return res.status(400).send({ error: 'No user ID supplied' });
   }
 
   const user = await getUserData(id);
@@ -24,6 +28,6 @@ export const httpUpdateUser = async (req: Request, res: Response) => {
     return res.status(400).send({ error: 'No user ID supplied' });
   }
 
-  const user = updateUserData(id, { didWin, guesses, guessMap });
+  const user = await updateUserData(id, { didWin, guesses, guessMap });
   return res.status(200).send(user);
 };
