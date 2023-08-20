@@ -32,7 +32,7 @@ export const addNewUser = () => __awaiter(void 0, void 0, void 0, function* () {
         updatedAt,
         didWin: false,
         guesses: [],
-        guessMap: ''
+        guessMap: '[]'
     };
     const result = yield collection.add(data);
     return {

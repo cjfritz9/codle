@@ -32,7 +32,7 @@ export const addNewUser = async (): Promise<UserData> => {
     updatedAt,
     didWin: false,
     guesses: [] as any[],
-    guessMap: ''
+    guessMap: '[]'
   };
 
   const result = await collection.add(data);
