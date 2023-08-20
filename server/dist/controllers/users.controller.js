@@ -23,6 +23,7 @@ export const httpAddUser = (_req, res) => __awaiter(void 0, void 0, void 0, func
 export const httpUpdateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     const { didWin, guesses, guessMap } = req.body;
+    console.log('patch req body: ', req.body);
     if (!id) {
         return res.status(400).send({ error: 'No user ID supplied' });
     }
