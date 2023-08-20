@@ -47,6 +47,7 @@ export const updateUserData = (id, data) => __awaiter(void 0, void 0, void 0, fu
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
+    console.log('update user data:', data);
     yield collection.doc(id).update(Object.assign({ updatedAt }, data));
     return Object.assign({ id, updatedAt: updatedAt.toDate() }, data);
 });
