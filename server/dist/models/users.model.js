@@ -46,7 +46,7 @@ export const addNewUser = () => __awaiter(void 0, void 0, void 0, function* () {
 export const updateUserData = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-    const updatedAt = new Timestamp(unixEpochNanoseconds, unixEpochSeconds);
+    const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
     yield collection.doc(id).update(Object.assign({ updatedAt }, data));
     return Object.assign({ id, updatedAt: updatedAt.toDate() }, data);
 });
