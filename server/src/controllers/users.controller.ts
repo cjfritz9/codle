@@ -18,7 +18,7 @@ export const httpGetUser = async (req: Request, res: Response) => {
 
 export const httpAddUser = async (_req: Request, res: Response) => {
   const user = await addNewUser();
-  return res.status(200).send(user);
+  return res.status(201).send(user);
 };
 
 export const httpUpdateUser = async (req: Request, res: Response) => {

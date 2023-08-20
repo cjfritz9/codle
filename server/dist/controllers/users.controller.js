@@ -11,20 +11,20 @@ import { addNewUser, getUserData, updateUserData } from '../models/users.model.j
 export const httpGetUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
     if (!id) {
-        return res.redirect('/add');
+        return res.status(400).send({ error: 'No user ID supplied' });
     }
     const user = yield getUserData(id);
     return res.status(200).send(user);
 });
 export const httpAddUser = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield addNewUser();
-    return res.status(200).send(user);
+    return res.status(201).send(user);
 });
 export const httpUpdateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id, didWin, guesses, guessMap } = req.body;
     if (!id) {
         return res.status(400).send({ error: 'No user ID supplied' });
     }
-    const user = updateUserData(id, { didWin, guesses, guessMap });
+    const user = yield updateUserData(id, { didWin, guesses, guessMap });
     return res.status(200).send(user);
 });
