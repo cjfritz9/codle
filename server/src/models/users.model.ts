@@ -54,10 +54,17 @@ export const updateUserData = async (
   const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
   const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
 
-  await collection.doc(id).set({
-    updatedAt,
-    ...data
-  });
+  if (!(await collection.doc(id).get()).exists) {
+    await collection.doc(id).set({
+      updatedAt,
+      ...data
+    });
+  } else {
+    await collection.doc(id).update({
+      updatedAt,
+      ...data
+    });
+  }
 
   return {
     id,

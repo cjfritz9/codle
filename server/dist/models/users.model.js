@@ -47,6 +47,11 @@ export const updateUserData = (id, data) => __awaiter(void 0, void 0, void 0, fu
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
-    yield collection.doc(id).set(Object.assign({ updatedAt }, data));
+    if (!(yield collection.doc(id).get()).exists) {
+        yield collection.doc(id).set(Object.assign({ updatedAt }, data));
+    }
+    else {
+        yield collection.doc(id).update(Object.assign({ updatedAt }, data));
+    }
     return Object.assign({ id, updatedAt: updatedAt.toDate() }, data);
 });
