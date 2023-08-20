@@ -3,5 +3,5 @@ import { httpGetUser, httpAddUser, httpUpdateUser } from '../controllers/users.c
 const usersRouter = express.Router();
 usersRouter.get('/:id', httpGetUser);
 usersRouter.post('/', httpAddUser);
-usersRouter.patch('/', httpUpdateUser);
+usersRouter.patch('/:id', httpUpdateUser);
 export default usersRouter;

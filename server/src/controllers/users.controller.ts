@@ -22,7 +22,8 @@ export const httpAddUser = async (_req: Request, res: Response) => {
 };
 
 export const httpUpdateUser = async (req: Request, res: Response) => {
-  const { id, didWin, guesses, guessMap } = req.body;
+  const { id } = req.params;
+  const { didWin, guesses, guessMap } = req.body;
 
   if (!id) {
     return res.status(400).send({ error: 'No user ID supplied' });
