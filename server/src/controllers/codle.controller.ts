@@ -7,12 +7,13 @@ import getDailyWord, {
   removeDuplicates
 } from '../models/codle.model.js';
 
-export const httpGetCodleWord = async (_req: Request, res: Response) => {
-  let word = await getDailyWord();
+export const httpGetCodleWord = async (req: Request, res: Response) => {
+  let timezoneOffset = req.query.timezoneOffset ?? '240';
+  let word = await getDailyWord(+timezoneOffset);
   let errorCounter = 0;
 
   while (errorCounter < 5 && !word) {
-    word = await getDailyWord();
+    word = await getDailyWord(+timezoneOffset);
     errorCounter++;
   }
 

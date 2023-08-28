@@ -8,11 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import getDailyWord, { addWord, getDuplicates, getList, isListValid, removeDuplicates } from '../models/codle.model.js';
-export const httpGetCodleWord = (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let word = yield getDailyWord();
+export const httpGetCodleWord = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    let timezoneOffset = (_a = req.query.timezoneOffset) !== null && _a !== void 0 ? _a : '240';
+    let word = yield getDailyWord(+timezoneOffset);
     let errorCounter = 0;
     while (errorCounter < 5 && !word) {
-        word = yield getDailyWord();
+        word = yield getDailyWord(+timezoneOffset);
         errorCounter++;
     }
     if (errorCounter >= 5 && !word) {

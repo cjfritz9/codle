@@ -13,7 +13,7 @@ const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
-const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
+const getDailyWord = (timezoneOffset = 240) => __awaiter(void 0, void 0, void 0, function* () {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const dailyWordDoc = yield dailyWordRef.get();
@@ -25,15 +25,16 @@ const getDailyWord = () => __awaiter(void 0, void 0, void 0, function* () {
     const { dailyWord, updatedAt } = wordData;
     if (!dailyWord || !updatedAt)
         return;
-    const databaseDay = updatedAt.toDate().getDay();
-    const currentDay = new Date().getDay();
-    const isWordOfDay = databaseDay === currentDay;
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
+    const clientDay = currentDate.getDay();
+    const isWordOfDay = updatedAt.toDate().getDate() === currentDate.getDate();
     if (isWordOfDay) {
         return dailyWord;
     }
     else {
         const wordList = (yield wordListRef.get()).data();
-        const newWord = getNewDailyWord(wordList, currentDay);
+        const newWord = getNewDailyWord(wordList, clientDay);
         if (!newWord)
             return;
         const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);

@@ -12,7 +12,7 @@ const dailyWordRef = collection.doc('dailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
 
-const getDailyWord = async () => {
+const getDailyWord = async (timezoneOffset = 240) => {
   const unixEpochSeconds = Math.round(Date.now() / 1000);
   const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
 
@@ -25,16 +25,18 @@ const getDailyWord = async () => {
   const { dailyWord, updatedAt } = wordData;
   if (!dailyWord || !updatedAt) return;
 
-  const databaseDay = updatedAt.toDate().getDay();
-  const currentDay = new Date().getDay();
-  const isWordOfDay = databaseDay === currentDay;
+  const currentDate = new Date();
+  currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
+  const clientDay = currentDate.getDay();
+
+  const isWordOfDay = updatedAt.toDate().getDate() === currentDate.getDate();
 
   if (isWordOfDay) {
     return dailyWord;
   } else {
     const wordList = (await wordListRef.get()).data() as WordListDocument;
 
-    const newWord = getNewDailyWord(wordList, currentDay);
+    const newWord = getNewDailyWord(wordList, clientDay);
     if (!newWord) return;
 
     const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
@@ -148,7 +150,7 @@ export const getWordsObject = async () => {
   return wordList;
 };
 
-export const getDate = ({tomorrow = false}) => {
+export const getDate = ({ tomorrow = false }) => {
   const date = new Date();
   date.setUTCHours(0);
   date.setUTCMinutes(0);
