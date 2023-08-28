@@ -29,7 +29,10 @@ const getDailyWord = async (timezoneOffset = 240) => {
   currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
   const clientDay = currentDate.getDay();
 
-  const isWordOfDay = updatedAt.toDate().getDate() === currentDate.getDate();
+  const isWordOfDay =
+    updatedAt.toDate().getFullYear() === currentDate.getFullYear() &&
+    updatedAt.toDate().getMonth() === currentDate.getMonth() &&
+    updatedAt.toDate().getDate() === currentDate.getDate();
 
   if (isWordOfDay) {
     return dailyWord;
