@@ -1,19 +1,25 @@
 import request from 'supertest';
 import '@jest/globals';
-import dotenv from 'dotenv';
 
-import app from '../src/app.js';
-import firestore from '../src/services/firestore.js';
-import { Timestamp } from 'firebase-admin/firestore';
+import app from '../../src/app.js';
+import firestore from '../../src/services/firestore.js';
 
 const collection = firestore.collection('users');
-
 const currentDate = new Date(new Date().toUTCString());
 
 describe('Codle Users API', () => {
+  beforeAll(async () => {
+    await collection.doc('test-user1').set({
+      didWin: false,
+      guessMap: '[]',
+      guesses: [],
+      updatedAt: currentDate.toUTCString()
+    });
+  });
   afterAll(async () => {
     await collection.listDocuments().then((refs) => {
       refs.map((doc) => {
+        if (doc.id.includes('test-user')) return;
         doc.delete();
       });
     });

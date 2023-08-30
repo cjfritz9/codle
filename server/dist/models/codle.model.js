@@ -44,11 +44,11 @@ const getDailyWord = async (timezoneOffset = 240) => {
             const nextWordData = nextWordDoc.data();
             const wordList = wordListDoc.data();
             const { word } = nextWordData;
-            dailyWordRef.set({
+            await dailyWordRef.set({
                 word,
                 updatedAt: currentDate.toUTCString()
             });
-            nextDailyWordRef.set({
+            await nextDailyWordRef.set({
                 word: getNewDailyWord(wordList, currentDate.getDay()),
                 updatedAt: currentDate.toUTCString()
             });
@@ -153,5 +153,10 @@ export const getDate = ({ tomorrow = false }) => {
         return new Date(date.setDate(date.getDate() + 1));
     }
     return date;
+};
+export const testingSetup = async () => {
+    // await 
+};
+export const testingTeardown = async () => {
 };
 export default getDailyWord;

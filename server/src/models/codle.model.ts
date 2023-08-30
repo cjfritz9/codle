@@ -1,4 +1,4 @@
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 
 import firestore from '../services/firestore.js';
 import {
@@ -64,11 +64,11 @@ const getDailyWord = async (timezoneOffset = 240) => {
       const wordList = wordListDoc.data() as WordListDocument;
       const { word } = nextWordData;
 
-      dailyWordRef.set({
+      await dailyWordRef.set({
         word,
         updatedAt: currentDate.toUTCString()
       });
-      nextDailyWordRef.set({
+      await nextDailyWordRef.set({
         word: getNewDailyWord(wordList, currentDate.getDay()),
         updatedAt: currentDate.toUTCString()
       });
@@ -197,5 +197,13 @@ export const getDate = ({ tomorrow = false }) => {
   }
   return date;
 };
+
+export const testingSetup = async () => {
+  // await 
+}
+
+export const testingTeardown = async () => {
+
+}
 
 export default getDailyWord;
