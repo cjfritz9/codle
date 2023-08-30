@@ -9,49 +9,83 @@ import {
 
 const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
+const nextDailyWordRef = collection.doc('nextDailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
 
-const getDailyWord = async (timezoneOffset = 240) => {
-  const unixEpochSeconds = Math.round(Date.now() / 1000);
-  const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-
-  const dailyWordDoc = await dailyWordRef.get();
-  if (!dailyWordDoc.exists) return;
-
-  const wordData = dailyWordDoc.data() as DailyWordDocument;
-  if (!wordData) return;
-
-  const { dailyWord, updatedAt } = wordData;
-  if (!dailyWord || !updatedAt) return;
-
-  const currentDate = new Date();
-  currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
-  const clientDay = currentDate.getDay();
-
-  const isWordOfDay =
-    updatedAt.toDate().getFullYear() === currentDate.getFullYear() &&
-    updatedAt.toDate().getMonth() === currentDate.getMonth() &&
-    updatedAt.toDate().getDate() === currentDate.getDate();
-
-  if (isWordOfDay) {
-    return dailyWord;
-  } else {
-    const wordList = (await wordListRef.get()).data() as WordListDocument;
-
-    const newWord = getNewDailyWord(wordList, clientDay);
-    if (!newWord) return;
-
+const getDailyWord = async(timezoneOffset = 240) => {
+  try {
+    const unixEpochSeconds = Math.round(Date.now() / 1000);
+    const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
-    const result = await dailyWordRef.set({
-      dailyWord: newWord,
-      updatedAt: timestamp
+
+    const dailyWordDoc = await dailyWordRef.get();
+    const wordData = dailyWordDoc.data() as DailyWordDocument;
+    const { word: dailyWord, updatedAt } = wordData;
+
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
+
+    const isWordOfDay =
+      updatedAt.toDate().getUTCFullYear() === currentDate.getFullYear() &&
+      updatedAt.toDate().getUTCMonth() === currentDate.getMonth() &&
+      updatedAt.toDate().getUTCDate() === currentDate.getDate();
+
+    console.log('is word of day?', isWordOfDay);
+    console.log('doc date', updatedAt.toDate().toISOString());
+    console.log('server date', currentDate.toISOString());
+    console.log({
+      CURR_DATE: currentDate.toISOString(),
+      DOC_DATE: updatedAt.toDate().toISOString(),
+      YEARS: [updatedAt.toDate().getUTCFullYear(), currentDate.getFullYear()],
+      MONTHS: [updatedAt.toDate().getUTCMonth(), currentDate.getMonth()],
+      DAYS: [updatedAt.toDate().getUTCDate(), currentDate.getDate()],
+      WEEKDAY: [updatedAt.toDate().getUTCDay(), currentDate.getDay()],
+      WORD_OF_DAY: isWordOfDay
     });
 
-    if (result.writeTime.toDate().getDay() === timestamp.toDate().getDay()) {
-      return newWord;
+    if (isWordOfDay) {
+      return dailyWord;
     }
-    return;
+
+    const resetDate = new Date();
+    resetDate.setHours(resetDate.getHours() - 11);
+    resetDate.setMinutes(resetDate.getMinutes() - 59);
+
+    const shouldUpdateWords =
+      updatedAt.toDate().getFullYear() < resetDate.getFullYear() ||
+      updatedAt.toDate().getMonth() < resetDate.getMonth() ||
+      updatedAt.toDate().getDate() < resetDate.getDate();
+
+    if (shouldUpdateWords) {
+      console.log('should update?');
+      const nextWordDoc = await nextDailyWordRef.get();
+      const wordListDoc = await wordListRef.get();
+      const nextWordData = nextWordDoc.data() as DailyWordDocument;
+      const wordList = wordListDoc.data() as WordListDocument;
+      const { word } = nextWordData;
+
+      dailyWordRef.set({
+        word,
+        updatedAt: timestamp
+      });
+      nextDailyWordRef.set({
+        word: getNewDailyWord(wordList, currentDate.getDay()),
+        updatedAt: timestamp
+      });
+
+      return word;
+    }
+
+    const nextWordDoc = await nextDailyWordRef.get();
+    const nextWordData = nextWordDoc.data() as DailyWordDocument;
+    const { word } = nextWordData;
+    console.log(word);
+
+    return word;
+  } catch (error) {
+    console.error(error);
+    return 'react';
   }
 };
 
@@ -138,8 +172,9 @@ const getNewDailyWord = (
     wordList.saturday,
     wordList.sunday
   ];
+  const nextDay = currentDay < 6 ? currentDay + 1 : 0;
 
-  const dailyWordList = Object.values(orderedWordList)[currentDay];
+  const dailyWordList = Object.values(orderedWordList)[nextDay];
   const newWord =
     dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
 

@@ -1,7 +1,7 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
 export interface DailyWordDocument {
-  dailyWord: string;
+  word: string;
   updatedAt: Timestamp;
 }
 

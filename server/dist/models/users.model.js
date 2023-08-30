@@ -1,17 +1,8 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { Timestamp } from 'firebase-admin/firestore';
 import firestore from '../services/firestore.js';
 const collection = firestore.collection('users');
-export const getUserData = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield collection.doc(id).get();
+export const getUserData = async (id) => {
+    const result = await collection.doc(id).get();
     if (!result.exists) {
         return addNewUser();
     }
@@ -23,8 +14,8 @@ export const getUserData = (id) => __awaiter(void 0, void 0, void 0, function* (
         guesses,
         guessMap
     };
-});
-export const addNewUser = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const addNewUser = async () => {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
@@ -34,7 +25,7 @@ export const addNewUser = () => __awaiter(void 0, void 0, void 0, function* () {
         guesses: [],
         guessMap: '[]'
     };
-    const result = yield collection.add(data);
+    const result = await collection.add(data);
     return {
         id: result.id,
         updatedAt: updatedAt.toDate(),
@@ -42,11 +33,18 @@ export const addNewUser = () => __awaiter(void 0, void 0, void 0, function* () {
         guesses: data.guesses,
         guessMap: data.guessMap
     };
-});
-export const updateUserData = (id, data) => __awaiter(void 0, void 0, void 0, function* () {
+};
+export const updateUserData = async (id, data) => {
     const unixEpochSeconds = Math.round(Date.now() / 1000);
     const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
     const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
-    yield collection.doc(id).set(Object.assign({ updatedAt }, data));
-    return Object.assign({ id, updatedAt: updatedAt.toDate() }, data);
-});
+    await collection.doc(id).set({
+        updatedAt,
+        ...data
+    });
+    return {
+        id,
+        updatedAt: updatedAt.toDate(),
+        ...data
+    };
+};

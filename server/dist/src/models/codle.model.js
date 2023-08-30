@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import firestore from '../services/firestore.js';
 const collection = firestore.collection('codle');
@@ -5,31 +14,19 @@ const dailyWordRef = collection.doc('dailyWord');
 const nextDailyWordRef = collection.doc('nextDailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
-const getDailyWord = async (timezoneOffset = 240) => {
+const getDailyWord = (timezoneOffset = 240) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const unixEpochSeconds = Math.round(Date.now() / 1000);
         const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
         const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
-        const dailyWordDoc = await dailyWordRef.get();
+        const dailyWordDoc = yield dailyWordRef.get();
         const wordData = dailyWordDoc.data();
         const { word: dailyWord, updatedAt } = wordData;
         const currentDate = new Date();
         currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
-        const isWordOfDay = updatedAt.toDate().getUTCFullYear() === currentDate.getFullYear() &&
-            updatedAt.toDate().getUTCMonth() === currentDate.getMonth() &&
-            updatedAt.toDate().getUTCDate() === currentDate.getDate();
-        console.log('is word of day?', isWordOfDay);
-        console.log('doc date', updatedAt.toDate().toISOString());
-        console.log('server date', currentDate.toISOString());
-        console.log({
-            CURR_DATE: currentDate.toISOString(),
-            DOC_DATE: updatedAt.toDate().toISOString(),
-            YEARS: [updatedAt.toDate().getUTCFullYear(), currentDate.getFullYear()],
-            MONTHS: [updatedAt.toDate().getUTCMonth(), currentDate.getMonth()],
-            DAYS: [updatedAt.toDate().getUTCDate(), currentDate.getDate()],
-            WEEKDAY: [updatedAt.toDate().getUTCDay(), currentDate.getDay()],
-            WORD_OF_DAY: isWordOfDay
-        });
+        const isWordOfDay = updatedAt.toDate().getFullYear() === currentDate.getFullYear() &&
+            updatedAt.toDate().getMonth() === currentDate.getMonth() &&
+            updatedAt.toDate().getDate() === currentDate.getDate();
         if (isWordOfDay) {
             return dailyWord;
         }
@@ -41,8 +38,8 @@ const getDailyWord = async (timezoneOffset = 240) => {
             updatedAt.toDate().getDate() < resetDate.getDate();
         if (shouldUpdateWords) {
             console.log('should update?');
-            const nextWordDoc = await nextDailyWordRef.get();
-            const wordListDoc = await wordListRef.get();
+            const nextWordDoc = yield nextDailyWordRef.get();
+            const wordListDoc = yield wordListRef.get();
             const nextWordData = nextWordDoc.data();
             const wordList = wordListDoc.data();
             const { word } = nextWordData;
@@ -56,26 +53,25 @@ const getDailyWord = async (timezoneOffset = 240) => {
             });
             return word;
         }
-        const nextWordDoc = await nextDailyWordRef.get();
+        const nextWordDoc = yield nextDailyWordRef.get();
         const nextWordData = nextWordDoc.data();
         const { word } = nextWordData;
-        console.log(word);
         return word;
     }
     catch (error) {
         console.error(error);
         return 'react';
     }
-};
-export const getList = async () => {
-    const wordListSnap = await fullListRef.get();
+});
+export const getList = () => __awaiter(void 0, void 0, void 0, function* () {
+    const wordListSnap = yield fullListRef.get();
     if (!wordListSnap.exists)
         return;
     const { list } = wordListSnap.data();
     return list;
-};
-export const addWord = async (word) => {
-    const list = await getList();
+});
+export const addWord = (word) => __awaiter(void 0, void 0, void 0, function* () {
+    const list = yield getList();
     if (!list)
         return;
     if (list.includes(word)) {
@@ -84,13 +80,13 @@ export const addWord = async (word) => {
             cause: { wordIndex: list.indexOf(word) }
         };
     }
-    await fullListRef.update({
+    yield fullListRef.update({
         list: FieldValue.arrayUnion(word)
     });
     return {
         success: 'Word added to word list'
     };
-};
+});
 export const isListValid = (list) => {
     const invalidItems = list.filter((word) => word.length !== 5);
     if (hasDuplicates(list)) {
@@ -139,13 +135,13 @@ const getNewDailyWord = (wordList, currentDay) => {
     const newWord = dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
     return newWord;
 };
-export const getWordsObject = async () => {
-    const wordListDoc = await wordListRef.get();
+export const getWordsObject = () => __awaiter(void 0, void 0, void 0, function* () {
+    const wordListDoc = yield wordListRef.get();
     if (!wordListDoc.exists)
         return;
     const wordList = wordListDoc.data();
     return wordList;
-};
+});
 export const getDate = ({ tomorrow = false }) => {
     const date = new Date();
     date.setUTCHours(0);
