@@ -16,7 +16,7 @@ export const getUserData = async (id: string): Promise<UserData> => {
 
   return {
     id,
-    updatedAt: updatedAt.toDate(),
+    updatedAt,
     didWin,
     guesses,
     guessMap
@@ -24,12 +24,10 @@ export const getUserData = async (id: string): Promise<UserData> => {
 };
 
 export const addNewUser = async (): Promise<UserData> => {
-  const unixEpochSeconds = Math.round(Date.now() / 1000);
-  const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-  const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
+  const currentDate = new Date(new Date().toUTCString());
 
   const data = {
-    updatedAt,
+    updatedAt: currentDate.toUTCString(),
     didWin: false,
     guesses: [] as any[],
     guessMap: '[]'
@@ -39,7 +37,7 @@ export const addNewUser = async (): Promise<UserData> => {
 
   return {
     id: result.id,
-    updatedAt: updatedAt.toDate(),
+    updatedAt: currentDate.toUTCString(),
     didWin: data.didWin,
     guesses: data.guesses,
     guessMap: data.guessMap
@@ -50,18 +48,16 @@ export const updateUserData = async (
   id: string,
   data: UserDataParams
 ): Promise<UserData> => {
-  const unixEpochSeconds = Math.round(Date.now() / 1000);
-  const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-  const updatedAt = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
+  const currentDate = new Date(new Date().toUTCString());
 
   await collection.doc(id).set({
-    updatedAt,
+    updatedAt: currentDate.toUTCString(),
     ...data
   });
 
   return {
     id,
-    updatedAt: updatedAt.toDate(),
+    updatedAt: currentDate.toUTCString(),
     ...data
   };
 };

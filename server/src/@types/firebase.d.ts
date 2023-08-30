@@ -1,8 +1,6 @@
-import { Timestamp } from 'firebase-admin/firestore';
-
 export interface DailyWordDocument {
   word: string;
-  updatedAt: Timestamp;
+  updatedAt: string;
 }
 
 export interface WordListDocument {
@@ -20,7 +18,7 @@ export interface FullWordListDocument {
 }
 
 export interface UserDataDocument {
-  updatedAt: Timestamp;
+  updatedAt: string;
   guesses: string[];
   guessMap: string;
   didWin: boolean;
@@ -34,7 +32,7 @@ export interface UserDataParams {
 
 export interface UserData {
   id: string;
-  updatedAt: Date;
+  updatedAt: string;
   guesses: string[];
   guessMap: string;
   didWin: boolean;

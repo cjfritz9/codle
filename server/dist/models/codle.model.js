@@ -1,4 +1,4 @@
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
 import firestore from '../services/firestore.js';
 const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
@@ -6,41 +6,39 @@ const nextDailyWordRef = collection.doc('nextDailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
 const getDailyWord = async (timezoneOffset = 240) => {
+    const currentDate = new Date(new Date().toUTCString());
     try {
-        const unixEpochSeconds = Math.round(Date.now() / 1000);
-        const unixEpochNanoseconds = Math.round(Date.now() / 1000000);
-        const timestamp = new Timestamp(unixEpochSeconds, unixEpochNanoseconds);
         const dailyWordDoc = await dailyWordRef.get();
         const wordData = dailyWordDoc.data();
-        const { word: dailyWord, updatedAt } = wordData;
-        const currentDate = new Date();
-        currentDate.setHours(currentDate.getHours() - timezoneOffset / 60);
-        const isWordOfDay = updatedAt.toDate().getUTCFullYear() === currentDate.getFullYear() &&
-            updatedAt.toDate().getUTCMonth() === currentDate.getMonth() &&
-            updatedAt.toDate().getUTCDate() === currentDate.getDate();
-        console.log('is word of day?', isWordOfDay);
-        console.log('doc date', updatedAt.toDate().toISOString());
-        console.log('server date', currentDate.toISOString());
-        console.log({
-            CURR_DATE: currentDate.toISOString(),
-            DOC_DATE: updatedAt.toDate().toISOString(),
-            YEARS: [updatedAt.toDate().getUTCFullYear(), currentDate.getFullYear()],
-            MONTHS: [updatedAt.toDate().getUTCMonth(), currentDate.getMonth()],
-            DAYS: [updatedAt.toDate().getUTCDate(), currentDate.getDate()],
-            WEEKDAY: [updatedAt.toDate().getUTCDay(), currentDate.getDay()],
-            WORD_OF_DAY: isWordOfDay
-        });
+        const { word: dailyWord, updatedAt: updateTime } = wordData;
+        const updatedAt = new Date(updateTime);
+        const clientDate = new Date(currentDate.toUTCString());
+        clientDate.setUTCHours(clientDate.getUTCHours() - timezoneOffset / 60);
+        const isWordOfDay = updatedAt.getUTCFullYear() === clientDate.getUTCFullYear() &&
+            updatedAt.getUTCMonth() === clientDate.getUTCMonth() &&
+            updatedAt.getUTCDate() === clientDate.getUTCDate();
         if (isWordOfDay) {
             return dailyWord;
         }
         const resetDate = new Date();
         resetDate.setHours(resetDate.getHours() - 11);
         resetDate.setMinutes(resetDate.getMinutes() - 59);
-        const shouldUpdateWords = updatedAt.toDate().getFullYear() < resetDate.getFullYear() ||
-            updatedAt.toDate().getMonth() < resetDate.getMonth() ||
-            updatedAt.toDate().getDate() < resetDate.getDate();
+        console.log({
+            clientTimestamp: clientDate,
+            wordTimestamp: updatedAt,
+            currentTimestamp: currentDate,
+            resetDate: resetDate
+        });
+        console.log({
+            clientHours: clientDate.getUTCHours(),
+            wordHours: updatedAt.getUTCHours(),
+            currentHours: currentDate.getUTCHours(),
+            resetDateHours: resetDate.getUTCHours()
+        });
+        const shouldUpdateWords = updatedAt.getFullYear() < resetDate.getFullYear() ||
+            updatedAt.getMonth() < resetDate.getMonth() ||
+            updatedAt.getDate() < resetDate.getDate();
         if (shouldUpdateWords) {
-            console.log('should update?');
             const nextWordDoc = await nextDailyWordRef.get();
             const wordListDoc = await wordListRef.get();
             const nextWordData = nextWordDoc.data();
@@ -48,18 +46,17 @@ const getDailyWord = async (timezoneOffset = 240) => {
             const { word } = nextWordData;
             dailyWordRef.set({
                 word,
-                updatedAt: timestamp
+                updatedAt: currentDate.toUTCString()
             });
             nextDailyWordRef.set({
                 word: getNewDailyWord(wordList, currentDate.getDay()),
-                updatedAt: timestamp
+                updatedAt: currentDate.toUTCString()
             });
             return word;
         }
         const nextWordDoc = await nextDailyWordRef.get();
         const nextWordData = nextWordDoc.data();
         const { word } = nextWordData;
-        console.log(word);
         return word;
     }
     catch (error) {
