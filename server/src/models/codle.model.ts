@@ -6,15 +6,18 @@ import {
   FullWordListDocument,
   WordListDocument
 } from '../@types/firebase.js';
+import { clearInterval } from 'timers';
+import { updateUserData } from './users.model.js';
 
 const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
 const nextDailyWordRef = collection.doc('nextDailyWord');
 const wordListRef = collection.doc('wordList');
 const fullListRef = collection.doc('fullWordList');
+const currentDate = new Date(new Date().toUTCString());
 
 const getDailyWord = async (timezoneOffset = 240) => {
-  const currentDate = new Date(new Date().toUTCString());
+  const offsetHours = timezoneOffset / 60;
   try {
     const dailyWordDoc = await dailyWordRef.get();
     const wordData = dailyWordDoc.data() as DailyWordDocument;
@@ -23,53 +26,44 @@ const getDailyWord = async (timezoneOffset = 240) => {
     const updatedAt = new Date(updateTime);
 
     const clientDate = new Date(currentDate.toUTCString());
-    clientDate.setUTCHours(clientDate.getUTCHours() - timezoneOffset / 60);
+    clientDate.setUTCHours(clientDate.getUTCHours() - offsetHours);
 
     const isWordOfDay =
       updatedAt.getUTCFullYear() === clientDate.getUTCFullYear() &&
       updatedAt.getUTCMonth() === clientDate.getUTCMonth() &&
       updatedAt.getUTCDate() === clientDate.getUTCDate();
 
-    if (isWordOfDay) {
-      return dailyWord;
-    }
-
-    const resetDate = new Date();
+    const resetDate = new Date(currentDate);
     resetDate.setHours(resetDate.getHours() - 11);
     resetDate.setMinutes(resetDate.getMinutes() - 59);
 
-    console.log({
-      clientTimestamp: clientDate,
-      wordTimestamp: updatedAt,
-      currentTimestamp: currentDate,
-      resetDate: resetDate
-    });
-
-    console.log({
-      clientHours: clientDate.getUTCHours(),
-      wordHours: updatedAt.getUTCHours(),
-      currentHours: currentDate.getUTCHours(),
-      resetDateHours: resetDate.getUTCHours()
-    });
-
+    if (isWordOfDay) {
+      return dailyWord;
+    }
     const shouldUpdateWords =
-      updatedAt.getFullYear() < resetDate.getFullYear() ||
-      updatedAt.getMonth() < resetDate.getMonth() ||
-      updatedAt.getDate() < resetDate.getDate();
+      updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
+      updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
+      updatedAt.getUTCDate() < resetDate.getUTCDate();
+
+    // console.log([
+    //   updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
+    //     updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
+    //     updatedAt.getUTCDate() < resetDate.getUTCDate()
+    // ]);
 
     if (shouldUpdateWords) {
       const nextWordDoc = await nextDailyWordRef.get();
-      const wordListDoc = await wordListRef.get();
       const nextWordData = nextWordDoc.data() as DailyWordDocument;
-      const wordList = wordListDoc.data() as WordListDocument;
       const { word } = nextWordData;
-
+      const nextWord = await getNewDailyWord(currentDate.getDay());
+      // console.log(wordList);
+      // console.log(word, nextWord);
       await dailyWordRef.set({
         word,
         updatedAt: currentDate.toUTCString()
       });
       await nextDailyWordRef.set({
-        word: getNewDailyWord(wordList, currentDate.getDay()),
+        word: nextWord,
         updatedAt: currentDate.toUTCString()
       });
 
@@ -87,7 +81,7 @@ const getDailyWord = async (timezoneOffset = 240) => {
   }
 };
 
-export const getList = async () => {
+export const getFullWordList = async () => {
   const wordListSnap = await fullListRef.get();
 
   if (!wordListSnap.exists) return;
@@ -97,8 +91,14 @@ export const getList = async () => {
   return list;
 };
 
+export const getWordList = async () => {
+  const wordListSnap = await wordListRef.get();
+  if (!wordListSnap.exists) return;
+  return wordListSnap.data();
+};
+
 export const addWord = async (word: string) => {
-  const list = await getList();
+  const list = await getFullWordList();
 
   if (!list) return;
 
@@ -157,10 +157,11 @@ export const removeDuplicates = (list: string[]) => {
   return list.filter((word, i) => list.indexOf(word) === i);
 };
 
-const getNewDailyWord = (
-  wordList: WordListDocument,
-  currentDay: number
-): string | undefined => {
+const getNewDailyWord = async (
+  currentDay: number,
+  useToday = false
+): Promise<string | undefined> => {
+  const wordList = (await getWordList()) as WordListDocument;
   const orderedWordList = [
     wordList.monday,
     wordList.tuesday,
@@ -170,9 +171,11 @@ const getNewDailyWord = (
     wordList.saturday,
     wordList.sunday
   ];
+  currentDay--;
   const nextDay = currentDay < 6 ? currentDay + 1 : 0;
 
-  const dailyWordList = Object.values(orderedWordList)[nextDay];
+  const dailyWordList =
+    Object.values(orderedWordList)[useToday ? currentDay : nextDay];
   const newWord =
     dailyWordList[Math.floor(Math.random() * dailyWordList.length)];
 
@@ -198,12 +201,76 @@ export const getDate = ({ tomorrow = false }) => {
   return date;
 };
 
-export const testingSetup = async () => {
-  // await 
-}
+// BACK-DOOR FUNCTIONS FOR JEST TESTS
 
-export const testingTeardown = async () => {
+const testingSetup = async () => {
+  const dailyWordRef = collection.doc('dailyWord');
+  const nextDailyWordRef = collection.doc('nextDailyWord');
 
-}
+  await dailyWordRef.set({
+    word: 'test1',
+    updatedAt: currentDate.toUTCString()
+  });
+  await nextDailyWordRef.set({
+    word: 'test2',
+    updatedAt: currentDate.toUTCString()
+  });
+};
+
+const testingTeardown = async () => {
+  const dailyWordRef = collection.doc('dailyWord');
+  const nextDailyWordRef = collection.doc('nextDailyWord');
+
+  await dailyWordRef.set({
+    word: await getNewDailyWord(currentDate.getUTCDay(), true),
+    updatedAt: currentDate.toUTCString()
+  });
+  await nextDailyWordRef.set({
+    word: await getNewDailyWord(currentDate.getUTCDay()),
+    updatedAt: currentDate.toUTCString()
+  });
+};
+
+const testingGetDailyWord = async () => {
+  const dailyWordDoc = await dailyWordRef.get();
+  const wordData = dailyWordDoc.data() as DailyWordDocument;
+  const { word, updatedAt } = wordData;
+
+  return { word, updatedAt };
+};
+
+const testingGetNextDailyWord = async () => {
+  const nextDailyWordDoc = await nextDailyWordRef.get();
+  const wordData = nextDailyWordDoc.data() as DailyWordDocument;
+  const { word, updatedAt } = wordData;
+
+  return { word, updatedAt };
+};
+
+const testingUpdateDailyWords = async () => {
+  const dummyTimestamp = new Date(
+    currentDate.getUTCFullYear(),
+    currentDate.getUTCMonth() - 1,
+    currentDate.getUTCDate() - 2
+  );
+  const { word } = await testingGetDailyWord();
+  const { word: nextWord } = await testingGetNextDailyWord();
+  await dailyWordRef.set({
+    word,
+    updatedAt: dummyTimestamp.toUTCString()
+  });
+  await nextDailyWordRef.set({
+    word: nextWord,
+    updatedAt: dummyTimestamp.toUTCString()
+  });
+};
+
+export const JEST_BACKDOOR = {
+  setup: testingSetup,
+  teardown: testingTeardown,
+  getDailyWord: testingGetDailyWord,
+  getNextDailyWord: testingGetNextDailyWord,
+  updateDailyWords: testingUpdateDailyWords
+};
 
 export default getDailyWord;

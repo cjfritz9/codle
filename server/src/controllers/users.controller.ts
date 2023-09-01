@@ -25,8 +25,6 @@ export const httpUpdateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { didWin, guesses, guessMap } = req.body;
 
-  console.log('patch req body: ', req.body);
-
   if (!id) {
     return res.status(400).send({ error: 'No user ID supplied' });
   }

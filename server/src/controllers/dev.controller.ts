@@ -35,7 +35,5 @@ export const httpDevTesting = async (_req: Request, res: Response) => {
   // console.log(resetDate.toUTCString());
   // console.log(compDate.toUTCString());
 
-  console.log(serviceAccount);
-
   res.status(200).send({ success: 'Completed' });
 };

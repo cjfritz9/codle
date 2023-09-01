@@ -1,4 +1,4 @@
-import getDailyWord, { addWord, getDuplicates, getList, isListValid, removeDuplicates } from '../models/codle.model.js';
+import getDailyWord, { addWord, getDuplicates, getFullWordList, isListValid, removeDuplicates } from '../models/codle.model.js';
 export const httpGetCodleWord = async (req, res) => {
     let timezoneOffset = req.query.timezoneOffset ?? '240';
     let word = await getDailyWord(+timezoneOffset);
@@ -31,7 +31,7 @@ export const httpAddWord = async (req, res) => {
     return res.status(201).send(result);
 };
 export const httpValidateData = async (_req, res) => {
-    const list = await getList();
+    const list = await getFullWordList();
     if (!list) {
         return res.status(500).send({ error: 'Internal Application Error' });
     }
@@ -39,7 +39,7 @@ export const httpValidateData = async (_req, res) => {
     return res.status(200).send({ ok: 'Check complete', result });
 };
 export const httpRemoveDuplicates = async (_req, res) => {
-    const list = await getList();
+    const list = await getFullWordList();
     if (!list) {
         return res.status(500).send({ error: 'Internal Application Error' });
     }

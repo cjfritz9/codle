@@ -1,6 +1,7 @@
 import type { JestConfigWithTsJest } from 'ts-jest';
 
 const jestConfig: JestConfigWithTsJest = {
+  detectOpenHandles: true,
   rootDir: './server/__tests__',
   preset: 'ts-jest/presets/default-esm',
   moduleNameMapper: {

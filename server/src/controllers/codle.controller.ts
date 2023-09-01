@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import getDailyWord, {
   addWord,
   getDuplicates,
-  getList,
+  getFullWordList,
   isListValid,
   removeDuplicates
 } from '../models/codle.model.js';
@@ -42,7 +42,7 @@ export const httpAddWord = async (req: Request, res: Response) => {
 };
 
 export const httpValidateData = async (_req: Request, res: Response) => {
-  const list = await getList();
+  const list = await getFullWordList();
   if (!list) {
     return res.status(500).send({ error: 'Internal Application Error' });
   }
@@ -51,7 +51,7 @@ export const httpValidateData = async (_req: Request, res: Response) => {
 };
 
 export const httpRemoveDuplicates = async (_req: Request, res: Response) => {
-  const list = await getList();
+  const list = await getFullWordList();
   if (!list) {
     return res.status(500).send({ error: 'Internal Application Error' });
   }
