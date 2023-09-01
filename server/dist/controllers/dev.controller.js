@@ -1,4 +1,3 @@
-import serviceAccount from '../secrets/gcp-service-account.json' assert { type: 'json' };
 export const httpDevTesting = async (_req, res) => {
     // const { timezoneOffset } = req.query;
     // const currentDate = new Date();
@@ -27,6 +26,5 @@ export const httpDevTesting = async (_req, res) => {
     // compDate.setMinutes(compDate.getMinutes() - 60);
     // console.log(resetDate.toUTCString());
     // console.log(compDate.toUTCString());
-    console.log(serviceAccount);
     res.status(200).send({ success: 'Completed' });
 };
