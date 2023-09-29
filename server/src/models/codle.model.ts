@@ -35,7 +35,6 @@ const getDailyWord = async (timezoneOffset = 240) => {
     resetDate.setHours(resetDate.getHours() - 11);
     resetDate.setMinutes(resetDate.getMinutes() - 59);
 
-
     if (isWordOfDay) {
       return dailyWord;
     }
