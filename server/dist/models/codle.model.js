@@ -18,7 +18,7 @@ const getDailyWord = async (timezoneOffset = 240) => {
         const isWordOfDay = updatedAt.getUTCFullYear() === clientDate.getUTCFullYear() &&
             updatedAt.getUTCMonth() === clientDate.getUTCMonth() &&
             updatedAt.getUTCDate() === clientDate.getUTCDate();
-        const resetDate = new Date(currentDate);
+        const resetDate = new Date(clientDate);
         resetDate.setHours(resetDate.getHours() - 11);
         resetDate.setMinutes(resetDate.getMinutes() - 59);
         if (isWordOfDay) {
@@ -27,18 +27,11 @@ const getDailyWord = async (timezoneOffset = 240) => {
         const shouldUpdateWords = updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
             updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
             updatedAt.getUTCDate() < resetDate.getUTCDate();
-        // console.log([
-        //   updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
-        //     updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
-        //     updatedAt.getUTCDate() < resetDate.getUTCDate()
-        // ]);
         if (shouldUpdateWords) {
             const nextWordDoc = await nextDailyWordRef.get();
             const nextWordData = nextWordDoc.data();
             const { word } = nextWordData;
             const nextWord = await getNewDailyWord(currentDate.getDay());
-            // console.log(wordList);
-            // console.log(word, nextWord);
             await dailyWordRef.set({
                 word,
                 updatedAt: currentDate.toUTCString()

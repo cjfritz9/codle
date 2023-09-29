@@ -6,8 +6,6 @@ import {
   FullWordListDocument,
   WordListDocument
 } from '../@types/firebase.js';
-import { clearInterval } from 'timers';
-import { updateUserData } from './users.model.js';
 
 const collection = firestore.collection('codle');
 const dailyWordRef = collection.doc('dailyWord');
@@ -33,31 +31,25 @@ const getDailyWord = async (timezoneOffset = 240) => {
       updatedAt.getUTCMonth() === clientDate.getUTCMonth() &&
       updatedAt.getUTCDate() === clientDate.getUTCDate();
 
-    const resetDate = new Date(currentDate);
+    const resetDate = new Date(clientDate);
     resetDate.setHours(resetDate.getHours() - 11);
     resetDate.setMinutes(resetDate.getMinutes() - 59);
+
 
     if (isWordOfDay) {
       return dailyWord;
     }
+
     const shouldUpdateWords =
       updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
       updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
       updatedAt.getUTCDate() < resetDate.getUTCDate();
-
-    // console.log([
-    //   updatedAt.getUTCFullYear() < resetDate.getUTCFullYear() ||
-    //     updatedAt.getUTCMonth() < resetDate.getUTCMonth() ||
-    //     updatedAt.getUTCDate() < resetDate.getUTCDate()
-    // ]);
 
     if (shouldUpdateWords) {
       const nextWordDoc = await nextDailyWordRef.get();
       const nextWordData = nextWordDoc.data() as DailyWordDocument;
       const { word } = nextWordData;
       const nextWord = await getNewDailyWord(currentDate.getDay());
-      // console.log(wordList);
-      // console.log(word, nextWord);
       await dailyWordRef.set({
         word,
         updatedAt: currentDate.toUTCString()

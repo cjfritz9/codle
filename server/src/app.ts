@@ -18,15 +18,11 @@ app.use(
 );
 
 app.use(morgan('combined'));
-
 app.use(express.json());
 
-app.use('/codle', codleRouter)
-
+app.use('/codle', codleRouter);
 app.use('/users', usersRouter);
-
 app.use('/dev-testing', devRouter);
-
 app.get('/*', (req, res) => {
   const reqUrl = req.url;
   res.status(404).send(`No page found at ${reqUrl}`);
